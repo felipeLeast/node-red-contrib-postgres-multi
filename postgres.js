@@ -19,6 +19,29 @@ var named = require('node-postgres-named');
 var querystring = require('querystring');
 
 module.exports = (RED) => {
+  function getField(node, kind, value) {
+    switch (kind) {
+      case 'flow': {
+        return node.context().flow.get(value);
+      }
+      case 'global': {
+        return node.context().global.get(value);
+      }
+      case 'num': {
+        return parseInt(value);
+      }
+      case 'bool': {
+        return JSON.parse(value);
+      }
+      case 'env': {
+        return process.env[value];
+      }
+      default: {
+        return value;
+      }
+    }
+  }
+
   RED.httpAdmin.get('/postgresdb/:id', (req, res) => {
     var credentials = RED.nodes.getCredentials(req.params.id);
     if (credentials) {
@@ -60,29 +83,30 @@ module.exports = (RED) => {
   });
 
   const PostgresDatabaseNode = function(n) {
-    RED.nodes.createNode(this, n);
-    this.hostname = n.hostname;
-    this.port = n.port;
-    this.db = n.db;
-    this.ssl = n.ssl;
+    const node = this;
+    RED.nodes.createNode(node, n);
 
-    var credentials = this.credentials;
-    if (credentials) {
-      this.user = credentials.user;
-      this.password = credentials.password;
-    }
+    node.name = n.name;
+    node.hostname = n.hostname;
+    node.hostFieldType = n.hostFieldType;
+    node.port = n.port;
+    node.portFieldType = n.portFieldType;
+    node.db = n.db;
+    node.dbFieldType = n.dbFieldType;
+    node.user = n.user;
+    node.userFieldType = n.userFieldType;
+    node.password = n.password;
+    node.passwordFieldType = n.passwordFieldType;
+
+    this.hostname = getField(node, n.hostFieldType, n.hostname);
+    this.port = getField(node, n.portFieldType, n.port);
+    this.db = getField(node, n.dbFieldType, n.db);
+    this.user = getField(node, n.userFieldType, n.user);
+    this.password = getField(node, n.passwordFieldType, n.password);
+    this.ssl = n.ssl;
   }
 
-  RED.nodes.registerType("postgresdb", PostgresDatabaseNode, {
-    credentials: {
-      user: {
-        type: "text"
-      },
-      password: {
-        type: "password"
-      }
-    }
-  });
+  RED.nodes.registerType("postgresdb", PostgresDatabaseNode);
 
   const PostgresNode = function(n) {
     RED.nodes.createNode(this, n);

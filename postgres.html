@@ -18,18 +18,25 @@
     <div class="form-row">
         <label for="node-config-input-hostname"><i class="fa fa-bookmark"></i> Host</label>
         <input class="input-append-left" type="text" id="node-config-input-hostname" placeholder="localhost" style="width: 40%;" >
+        <input type="hidden" id="node-config-input-hostFieldType">
         <label for="node-config-input-port" style="margin-left: 10px; width: 35px; "> Port</label>
-        <input type="text" id="node-config-input-port" placeholder="5432" style="width:45px">
+        <input type="hidden" id="node-config-input-portFieldType">
+        <input type="text" id="node-config-input-port" placeholder="5432" style="width:95px">
     </div>
     <div class="form-row">
         <label for="node-config-input-db"><i class="fa fa-briefcase"></i> Database</label>
+        <input type="hidden" id="node-config-input-dbFieldType">
         <input type="text" id="node-config-input-db" placeholder="test">
     </div>
     <div class="form-row">
         <label for="node-config-input-name"><i class="fa fa-user"></i> Username</label>
+        <input type="hidden" id="node-config-input-userFieldType">
         <input type="text" id="node-config-input-user" placeholder="postgres">
+    </div>
+    <div class="form-row">
         <label for="node-config-input-password"><i class="fa fa-lock"></i> Password</label>
-        <input type="password" id="node-config-input-password" placeholder="postgres">
+        <input type="hidden" id="node-config-input-passwordFieldType">
+        <input type="text" id="node-config-input-password" placeholder="postgres">
     </div>
     <div class="form-row">
        <label>&nbsp;</label>
@@ -44,16 +51,61 @@
         color:"rgb(218, 196, 180)",
         defaults: {
             hostname: { value:"localhost",required:true},
+            hostFieldType: {
+                value: "str"
+            },
             port: { value: 5432,required:true},
+            portFieldType: {
+                value: "num"
+            },
             db: { value:"postgres",required:true},
-            ssl: { value:false }
-        },
-        credentials: {
+            dbFieldType: {
+                value: "str"
+            },
             user: {type: "text"},
-            password: {type: "password"}
+            userFieldType: {
+                value: "str"
+            },
+            password: {type: "password"},
+            passwordFieldType: {
+                value: "str"
+            },
+            ssl: { value:false },
         },
         label: function() {
             return this.name||this.hostname+":"+this.port+"/"+this.db;
+        },
+        oneditprepare: function () {
+            $("#node-config-input-hostname").typedInput({
+                default: 'str',
+                types: ['str', 'flow', 'global', 'env'],
+                typeField: $("#node-config-input-hostFieldType")
+            });
+
+            $("#node-config-input-port").typedInput({
+                default: 'num',
+                types: ['num', 'flow', 'global', 'env'],
+                typeField: $("#node-config-input-portFieldType")
+            });
+
+            $("#node-config-input-db").typedInput({
+                default: 'str',
+                types: ['str', 'flow', 'global', 'env'],
+                typeField: $("#node-config-input-dbFieldType")
+            });
+
+            $("#node-config-input-user").typedInput({
+                default: 'str',
+                types: ['str', 'flow', 'global', 'env'],
+                typeField: $("#node-config-input-userFieldType")
+            });
+
+            $("#node-config-input-password")
+                .typedInput({
+                    default: 'str',
+                    types: ['str', 'flow', 'global', 'env'],
+                    typeField: $("#node-config-input-passwordFieldType")
+                });
         }
     });
 </script>
